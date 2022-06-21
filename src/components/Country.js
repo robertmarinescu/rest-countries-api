@@ -9,7 +9,7 @@ function Country({darkMode, name, population, region, capital, flag}) {
         <div className='details'>
             <h3 className='name'>{name}</h3>
             <p>Population: {""}
-                <span className={`values ${darkMode ? 'darkMode' : ''}`}>{population}</span>
+                <span className={`values ${darkMode ? 'darkMode' : ''}`}>{population.toLocaleString()}</span>
             </p>
             <p>Region: {""}
                 <span className={`values ${darkMode ? 'darkMode' : ''}`}>{region}</span>
