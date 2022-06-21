@@ -7,6 +7,7 @@ import CountryDetails from './components/CountryDetails'
 
 const URL_ALL_COUNTRIES = 'https://restcountries.com/v2/all'
 const URL_COUNTRY_NAME = 'https://restcountries.com/v2/name'
+const URL_COUNTRIES_BY_REGION = 'https://restcountries.com/v2/region'
 
 function App() {
   const [darkMode, setDarkMode] = useState(false)
@@ -20,39 +21,63 @@ function App() {
     setDarkMode(prevState => !prevState)
   }
 
-  useEffect(() => {
+  function fetchResources(fetchFunction) {
     try {
-      fetchCountriesData()
+      fetchFunction()
     } catch (error) {
       console.log(error)
     }
+  }
+
+  useEffect(() => {
+    fetchResources(fetchCountriesData)
   }, [])
 
   const fetchCountriesData = async () => {
     const response = await fetch(URL_ALL_COUNTRIES)
     const data = await response.json()
-    console.log('response=> ', data)
+
+    if(data.status === 404) {
+      setCountries([])
+      return;
+    }
+
     setCountries(data)
   }
 
   const searchCountries = () => {
     const country = countriesInputRef.current.value;
 
-    if(country.trim()) {
-      const fetchSearch = async () => {
+    if (country.trim()) {
+      const fetchCountry = async () => {
         const response = await fetch(`${URL_COUNTRY_NAME}/${country}`)
         const data = await response.json()
-        console.log('Search country => ', data)
         setCountries(data)
       }
 
-      try {
-        fetchSearch()
-      } catch (error) {
-        console.error(error)
-      }
+      fetchResources(fetchCountry)
     } else {
       fetchCountriesData()
+    }
+  }
+
+  const searchCountriesBySelectedRegion = () => {
+    const region = regionRef.current.value
+
+    if (region.trim()) {
+      const fetchRegion = async () => {
+        const response = await fetch(`${URL_COUNTRIES_BY_REGION}/${region}`)
+        const data = await response.json()
+
+        if (region === 'All') {
+          fetchResources(fetchCountriesData)
+          return;
+        }
+
+        setCountries(data)
+      }
+
+      fetchResources(fetchRegion)
     }
   }
 
@@ -69,10 +94,10 @@ function App() {
               <input type='text' placeholder='Search for a country...' ref={countriesInputRef} onChange={searchCountries}/>
             </div>
             <div className={`select_region ${darkMode ? 'darkMode' : ''}`}>
-              <select ref={regionRef}>
+              <select ref={regionRef} onChange={searchCountriesBySelectedRegion}>
                 <option>All</option>
                 <option>Africa</option>
-                <option>America</option>
+                <option>Americas</option>
                 <option>Asia</option>
                 <option>Europe</option>
                 <option>Oceania</option>
@@ -84,7 +109,6 @@ function App() {
             {!noCountries ? (
               countries.map(country => {
                 const {numericCode, name, population, region, capital, flag} = country
-                console.log(noCountries)
                 return <Country 
                   key={name} 
                   code = {numericCode}
