@@ -258,7 +258,7 @@ body {
 }
 
 .info .values{
-  color: gray
+  color: rgb(167, 164, 164)
 }
 
 .info .values.darkMode{
