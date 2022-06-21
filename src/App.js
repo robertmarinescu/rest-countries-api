@@ -14,6 +14,8 @@ function App() {
   const countriesInputRef = useRef();
   const regionRef = useRef()
 
+  const noCountries = countries.status || countries.message
+
   const switchMode = () => {
     setDarkMode(prevState => !prevState)
   }
@@ -29,7 +31,7 @@ function App() {
   const fetchCountriesData = async () => {
     const response = await fetch(URL_ALL_COUNTRIES)
     const data = await response.json()
-
+    console.log('response=> ', data)
     setCountries(data)
   }
 
@@ -40,7 +42,7 @@ function App() {
       const fetchSearch = async () => {
         const response = await fetch(`${URL_COUNTRY_NAME}/${country}`)
         const data = await response.json()
-
+        console.log('Search country => ', data)
         setCountries(data)
       }
 
@@ -79,10 +81,10 @@ function App() {
           </div>
 
           <div className='countries'>
-            {/* <Country darkMode={darkMode}/> */}
-            {
+            {!noCountries ? (
               countries.map(country => {
                 const {numericCode, name, population, region, capital, flag} = country
+                console.log(noCountries)
                 return <Country 
                   key={name} 
                   code = {numericCode}
@@ -94,6 +96,8 @@ function App() {
                   flag={flag}
                 />
               }
+            )) : (
+              <p>No countries found...</p>
             )}
           </div>
         </div>
